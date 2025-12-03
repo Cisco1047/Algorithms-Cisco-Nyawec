@@ -39,21 +39,45 @@ class SimulationStatistics:
         """Record queue length at a specific time."""
         self.queue_length_samples.append((time, length))
     
+    # Helper methods for extracting time values
+    
+    def _get_valid_wait_times(self) -> List[float]:
+        """Extract valid wait times from served customers."""
+        return [
+            c.get_wait_time() for c in self.served_customers 
+            if c.get_wait_time() is not None
+        ]
+    
+    def _get_valid_service_times(self) -> List[float]:
+        """Extract valid service times from served customers."""
+        return [
+            c.service_end_time - c.service_start_time
+            for c in self.served_customers
+            if c.service_start_time is not None and c.service_end_time is not None
+        ]
+    
+    def _get_valid_total_times(self) -> List[float]:
+        """Extract valid total times from served customers."""
+        return [
+            c.get_total_time() for c in self.served_customers 
+            if c.get_total_time() is not None
+        ]
+    
     # Wait time statistics
     
     def get_average_wait_time(self) -> float:
         """Calculate average wait time across all served customers."""
-        wait_times = [c.get_wait_time() for c in self.served_customers if c.get_wait_time() is not None]
+        wait_times = self._get_valid_wait_times()
         return sum(wait_times) / len(wait_times) if wait_times else 0.0
     
     def get_max_wait_time(self) -> float:
         """Get the maximum wait time experienced by any customer."""
-        wait_times = [c.get_wait_time() for c in self.served_customers if c.get_wait_time() is not None]
+        wait_times = self._get_valid_wait_times()
         return max(wait_times) if wait_times else 0.0
     
     def get_min_wait_time(self) -> float:
         """Get the minimum wait time experienced by any customer."""
-        wait_times = [c.get_wait_time() for c in self.served_customers if c.get_wait_time() is not None]
+        wait_times = self._get_valid_wait_times()
         return min(wait_times) if wait_times else 0.0
     
     def get_wait_time_by_priority(self) -> Dict[CustomerPriority, float]:
@@ -76,16 +100,12 @@ class SimulationStatistics:
     
     def get_average_service_time(self) -> float:
         """Calculate average service time across all served customers."""
-        service_times = [
-            c.service_end_time - c.service_start_time
-            for c in self.served_customers
-            if c.service_start_time is not None and c.service_end_time is not None
-        ]
+        service_times = self._get_valid_service_times()
         return sum(service_times) / len(service_times) if service_times else 0.0
     
     def get_average_total_time(self) -> float:
         """Calculate average total time (wait + service) for served customers."""
-        total_times = [c.get_total_time() for c in self.served_customers if c.get_total_time() is not None]
+        total_times = self._get_valid_total_times()
         return sum(total_times) / len(total_times) if total_times else 0.0
     
     # Customer statistics
