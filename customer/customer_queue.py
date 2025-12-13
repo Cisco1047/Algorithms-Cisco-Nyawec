@@ -30,6 +30,14 @@ class CustomerQueue:
             self._regular.append(customer)
         else:
             raise ValueError(f"Unknown customer kind: {customer.kind}")
+        
+    def remove_customer(self, customer):
+        queues = [self._vip, self._elderly, self._appointments, self._regular]
+        for q in queues:
+            if customer in q:
+                q.remove(customer)
+                return True
+        return False
 
     def is_empty(self) -> bool:
         """Return True if no one is waiting."""
