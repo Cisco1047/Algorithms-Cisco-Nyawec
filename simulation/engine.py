@@ -44,15 +44,3 @@ class SimulationEngine:
 
             self.current_time = event.time
             event.action(self)
-
-
-class ArrivalEvent:
-    pass
-
-
-class DepartureEvent:
-    pass
-
-
-class AbandonmentEvent:
-    pass
