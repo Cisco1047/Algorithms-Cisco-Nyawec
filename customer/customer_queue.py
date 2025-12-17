@@ -1,5 +1,6 @@
 from collections import deque
-from .customer import Customer
+from customer.customer import Customer
+
 
 class CustomerQueue:
     """
@@ -11,6 +12,7 @@ class CustomerQueue:
     3) APPOINTMENT
     4) REGULAR (FIFO)
     """
+
     def __init__(self):
         self._vip = deque()
         self._elderly = deque()
@@ -30,7 +32,7 @@ class CustomerQueue:
             self._regular.append(customer)
         else:
             raise ValueError(f"Unknown customer kind: {customer.kind}")
-        
+
     def remove_customer(self, customer):
         queues = [self._vip, self._elderly, self._appointments, self._regular]
         for q in queues:
@@ -45,6 +47,12 @@ class CustomerQueue:
                 not self._elderly and
                 not self._appointments and
                 not self._regular)
+
+    """
+    Order customers by priority and pop the next one to be served.
+    VIP customers are served first, Elderly have second priority, followed by Appointment customers,
+    and finally Regular (walk-in) customers are served last.
+    """
 
     def pop_next(self) -> Customer | None:
         if self._vip:

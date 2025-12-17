@@ -2,24 +2,26 @@ class TellerAssignmentSystem:
     def __init__(self, tellers):
         self.tellers = tellers
 
-    def get_free_teller(self, current_time):
+    """
+    Changed implementation to line up more with the requirement of having 
+    "faster tellers assigned to high-priority queue."
+    """
+    def get_free_tellers(self, current_time):
+        available_tellers = []
         for teller in self.tellers:
             if not teller.is_busy or teller.busy_until <= current_time:
                 teller.is_busy = False
-                return teller
-        return None
+                available_tellers.append(teller)
+        return available_tellers
 
-    def assign_customer(self, engine, customer):
-        teller = self.get_free_teller(engine.current_time)
-        if teller is None:
-            return None 
+    def assign_teller_to_priority_customer(self, customer_time, customer_kind: str):
+        available_tellers = self.get_free_tellers(customer_time)
+        if not available_tellers:
+            return None
 
-        service_time = teller.start_service(engine, customer)
+        kind = customer_kind.upper()
 
-        engine.schedule(engine.current_time + service_time,
-                        lambda eng: self.finish_customer(eng, teller, customer))
-        return teller
-
-    def finish_customer(self, engine, teller, customer):
-        teller.finish_service()
-        print(f"[{engine.current_time}] Customer {customer.id} finished at Teller {teller.id}")
+        # Assign the fastest available teller to high-priority customers
+        if kind in ('VIP', 'ELDERLY', 'APPOINTMENT'):
+            return max(available_tellers, key=lambda t: t.service_rate)
+        return min(available_tellers, key=lambda t: (t.total_busy_time, t.service_rate))
