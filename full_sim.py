@@ -120,7 +120,7 @@ def schedule_switch_attempt(customer):
             if upgrade_customer_kind(cust):
                 switched_once.add(cust.id)
 
-                # increase patience a bit after switching (optional but useful)
+                # increase patience a bit after switching
                 cust.patience += PATIENCE_BONUS
 
                 queue.add_customer(cust)
